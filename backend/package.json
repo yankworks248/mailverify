@@ -5,9 +5,11 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev":   "node --watch src/index.js"
+    "dev": "node --watch src/index.js"
   },
   "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "jsonwebtoken": "^9.0.2",
     "express": "^4.19.2",
     "pg": "^8.13.0",
     "dotenv": "^16.4.5",
@@ -18,5 +20,7 @@
     "node-cron": "^3.0.3",
     "cors": "^2.8.5"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

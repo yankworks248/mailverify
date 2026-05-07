@@ -21,6 +21,10 @@ services:
       WORKER_CONCURRENCY: "4"
       WORKER_POLL_MS: "2000"
       CORS_ORIGIN: "https://verify.inboxaxis.net"
+      NODE_ENV: "production"
+      ADMIN_USERNAME: "${ADMIN_USERNAME}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
+      SESSION_SECRET: "${SESSION_SECRET}"
     restart: unless-stopped
     depends_on:
       - postgres

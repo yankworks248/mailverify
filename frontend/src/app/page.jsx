@@ -1,15 +1,17 @@
-'use client';
-import { useEffect, useState, useCallback } from 'react';
-import SingleVerify from '@/components/SingleVerify';
-import BulkUpload   from '@/components/BulkUpload';
-import StatsBar     from '@/components/StatsBar';
-import JobsList     from '@/components/JobsList';
-import JobDetail    from '@/components/JobDetail';
-import { api } from '@/lib/api';
+"use client";
+import { useEffect, useState, useCallback } from "react";
+import SingleVerify from "@/components/SingleVerify";
+import BulkUpload from "@/components/BulkUpload";
+import StatsBar from "@/components/StatsBar";
+import JobsList from "@/components/JobsList";
+import JobDetail from "@/components/JobDetail";
+import { api } from "@/lib/api";
 
 export default function Home() {
+  const [authed, setAuthed] = useState(null);
+  const [user, setUser] = useState(null);
   const [health, setHealth] = useState(null);
-  const [jobs,   setJobs]   = useState([]);
+  const [jobs, setJobs] = useState([]);
   const [selectedUuid, setSelectedUuid] = useState(null);
   const [refreshTick, setRefreshTick] = useState(0);
 
@@ -20,34 +22,81 @@ export default function Home() {
       setJobs(j);
       setRefreshTick((t) => t + 1);
     } catch (err) {
-      console.error('refresh failed:', err.message);
+      console.error("refresh failed:", err.message);
     }
   }, []);
 
-  useEffect(() => { refresh(); }, [refresh]);
-
   useEffect(() => {
-    const hasActiveJob = jobs.some((j) => j.status === 'processing' || j.status === 'pending');
-    if (!hasActiveJob) return;
-    const interval = setInterval(refresh, 4000);
-    return () => clearInterval(interval);
-  }, [jobs, refresh]);
-
-  const handleVerified   = useCallback(() => refresh(), [refresh]);
-  const handleJobCreated = useCallback((job) => {
-    refresh();
-    if (job?.jobUuid) setSelectedUuid(job.jobUuid);
+    api
+      .me()
+      .then((u) => {
+        setUser(u);
+        setAuthed(true);
+        refresh();
+      })
+      .catch(() => {
+        window.location.href = "/login";
+      });
   }, [refresh]);
 
-  const selectedJob = selectedUuid ? jobs.find((j) => j.jobUuid === selectedUuid) : null;
+  useEffect(() => {
+    if (!authed) return;
+    const hasActive = jobs.some(
+      (j) => j.status === "processing" || j.status === "pending",
+    );
+    if (!hasActive) return;
+    const interval = setInterval(refresh, 4000);
+    return () => clearInterval(interval);
+  }, [authed, jobs, refresh]);
+
+  const handleVerified = useCallback(() => refresh(), [refresh]);
+  const handleJobCreated = useCallback(
+    (job) => {
+      refresh();
+      if (job?.jobUuid) setSelectedUuid(job.jobUuid);
+    },
+    [refresh],
+  );
+
+  async function handleLogout() {
+    try {
+      await api.logout();
+    } catch (_) {}
+    window.location.href = "/login";
+  }
+
+  if (authed === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-[13px] text-zinc-400">
+        Loading…
+      </div>
+    );
+  }
+
+  const selectedJob = selectedUuid
+    ? jobs.find((j) => j.jobUuid === selectedUuid)
+    : null;
 
   return (
     <div className="min-h-screen bg-white">
       <header className="border-b border-zinc-100 bg-white/80 backdrop-blur sticky top-0 z-10">
-        <div className="max-w-[1400px] mx-auto px-8 py-4">
+        <div className="max-w-[1400px] mx-auto px-8 py-4 flex items-center justify-between">
           <span className="text-[15px] font-semibold tracking-tight text-zinc-900">
             Email Verifier
           </span>
+          <div className="flex items-center gap-4">
+            {user?.username && (
+              <span className="text-[12px] text-zinc-500 font-mono">
+                {user.username}
+              </span>
+            )}
+            <button
+              onClick={handleLogout}
+              className="text-[12px] text-zinc-500 hover:text-zinc-900 transition-base"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </header>
 
@@ -80,7 +129,8 @@ export default function Home() {
       </main>
 
       <footer className="max-w-[1400px] mx-auto px-8 py-6 text-[11px] text-zinc-400 font-mono">
-        verify.inboxaxis.net · 4-level verification · Address → Domain → Mailbox → Risk
+        verify.inboxaxis.net · 4-level verification · Address → Domain → Mailbox
+        → Risk
       </footer>
     </div>
   );
