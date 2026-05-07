@@ -1,0 +1,22 @@
+{
+  "name": "mailverify",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["backend", "frontend"],
+  "scripts": {
+    "db:up":   "docker compose -f docker-compose.dev.yml up -d",
+    "db:down": "docker compose -f docker-compose.dev.yml down",
+    "db:logs": "docker compose -f docker-compose.dev.yml logs -f postgres",
+    "db:psql": "docker exec -it verifier-postgres-dev psql -U verifier -d verifier",
+    "dev":     "concurrently -n backend,frontend -c green,cyan \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "dev:backend":    "npm run dev -w backend",
+    "dev:frontend":   "npm run dev -w frontend",
+    "build:frontend": "npm run build -w frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

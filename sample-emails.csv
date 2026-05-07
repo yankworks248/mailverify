@@ -1,0 +1,21 @@
+first_name,last_name,email,company
+Alice,Singh,alice@acmecorp.com,ACME Corp
+Bob,Patel,bob@example.org,Example Inc
+Carol,Khan,carol@gmail.com,Freelance
+Dev,Sharma,info@hetzner.com,Hetzner
+Esha,Roy,esha@invalid-domain-xyz123.tld,Unknown Co
+Farhan,Ali,farhan@yahoo.com,Independent
+Gita,Verma,admin@stripe.com,Stripe
+Harsh,Mehta,harsh@mailinator.com,Throwaway
+Ishaan,Joshi,ishaan@hotmail.com,Personal
+Jaya,Reddy,jaya@notarealdomain.example,Fake LLC
+Kabir,Nair,kabir@vercel.com,Vercel
+Leena,Iyer,leena@cloudflare.com,Cloudflare
+Manav,Das,sales@hubspot.com,HubSpot
+Naina,Kapoor,naina@anthropic.com,Anthropic
+Omkar,Pillai,omkar@openai.com,OpenAI
+Priya,Bose,priya@github.com,GitHub
+Quinn,D'Souza,quinn@stripe.com,Stripe
+Rohan,Sen,not-an-email,Broken Co
+Sara,Banerjee,sara@notion.so,Notion
+Tarun,Ghosh,tarun@linear.app,Linear

@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: verifier-postgres-dev
+    environment:
+      POSTGRES_USER: verifier
+      POSTGRES_PASSWORD: verifier_dev_pw
+      POSTGRES_DB: verifier
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - verifier_pg_dev:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U verifier -d verifier"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  verifier_pg_dev:

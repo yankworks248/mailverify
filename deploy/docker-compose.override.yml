@@ -1,0 +1,27 @@
+services:
+  backend:
+    build:
+      context: /opt/email-verifier-backend
+      dockerfile: Dockerfile
+    image: verifier-backend:latest
+    container_name: verifier-backend
+    network_mode: host
+    environment:
+      PORT: "3000"
+      HOST: "127.0.0.1"
+      PGHOST: "127.0.0.1"
+      PGPORT: "5433"
+      PGUSER: "${POSTGRES_USER}"
+      PGPASSWORD: "${POSTGRES_PASSWORD}"
+      PGDATABASE: "${POSTGRES_DB}"
+      MOCK_REACHER: "false"
+      REACHER_URL: "http://127.0.0.1:8080/v0/check_email"
+      VERIFIER_FROM_EMAIL: "verifier@inboxaxis.net"
+      REACHER_TIMEOUT_MS: "30000"
+      WORKER_CONCURRENCY: "4"
+      WORKER_POLL_MS: "2000"
+      CORS_ORIGIN: "https://verify.inboxaxis.net"
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - reacher
