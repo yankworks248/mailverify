@@ -50,7 +50,7 @@ ok "Override in place"
 
 step "3. Apply DB schema migration"
 docker exec -i verifier-postgres psql -U "$PGUSER_VAL" -d "$PGDB_VAL" >/dev/null <<'SQL'
-ALTER TABLE verifications ADD COLUMN IF NOT EXISTS status     TEXT NOT NULL DEFAULT 'done';
+ALTER TABLE verifications ADD COLUMN IF NOT EXISTS status     TEXT NOT NULL DEFAULT 'pending';
 ALTER TABLE verifications ADD COLUMN IF NOT EXISTS first_name TEXT;
 ALTER TABLE verifications ADD COLUMN IF NOT EXISTS last_name  TEXT;
 CREATE INDEX IF NOT EXISTS idx_verifications_status     ON verifications(status) WHERE status = 'pending';
