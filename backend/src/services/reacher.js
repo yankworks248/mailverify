@@ -29,11 +29,13 @@ async function probeReal(email, ipRecord) {
     });
     if (!res.ok) {
       const text = await res.text().catch(() => '');
-      throw new Error(`reacher_http_${res.status}: ${text.slice(0, 200)}`);
+      console.error(`[probe] upstream http ${res.status}:`, text.slice(0, 500));
+      const bucket = res.status >= 500 ? 'probe_http_5xx' : 'probe_http_4xx';
+      throw new Error(bucket);
     }
     return await res.json();
   } catch (err) {
-    if (err.name === 'AbortError') throw new Error(`reacher_timeout_${TIMEOUT_MS}ms`);
+    if (err.name === 'AbortError') throw new Error('probe_timeout');
     throw err;
   } finally {
     clearTimeout(t);
