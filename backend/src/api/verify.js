@@ -21,7 +21,7 @@ router.post('/single', async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error('[POST /verify/single]', err);
-    res.status(500).json({ error: 'internal_error', message: err.message });
+    res.status(500).json({ error: 'internal_error' });
   }
 });
 
@@ -36,7 +36,7 @@ router.post('/bulk/peek', upload.single('file'), async (req, res) => {
     });
   } catch (err) {
     console.error('[POST /verify/bulk/peek]', err);
-    res.status(400).json({ error: 'csv_parse_failed', message: err.message });
+    res.status(400).json({ error: 'csv_parse_failed' });
   }
 });
 
@@ -54,7 +54,8 @@ router.post('/bulk', upload.single('file'), async (req, res) => {
   try {
     rows = extractRows(req.file.buffer, mapping);
   } catch (err) {
-    return res.status(400).json({ error: 'csv_parse_failed', message: err.message });
+    console.error('[POST /verify/bulk extractRows]', err);
+    return res.status(400).json({ error: 'csv_parse_failed' });
   }
 
   if (rows.length === 0) {
@@ -98,7 +99,7 @@ router.post('/bulk', upload.single('file'), async (req, res) => {
   } catch (err) {
     await client.query('ROLLBACK');
     console.error('[POST /verify/bulk]', err);
-    res.status(500).json({ error: 'internal_error', message: err.message });
+    res.status(500).json({ error: 'internal_error' });
   } finally {
     client.release();
   }

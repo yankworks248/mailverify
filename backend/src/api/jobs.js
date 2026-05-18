@@ -18,7 +18,8 @@ router.get("/", async (req, res) => {
     );
     res.json(rows.map(formatJob));
   } catch (err) {
-    res.status(500).json({ error: "internal_error", message: err.message });
+    console.error("[GET /jobs]", err);
+    res.status(500).json({ error: "internal_error" });
   }
 });
 
@@ -35,7 +36,8 @@ router.get("/:uuid", async (req, res) => {
       return res.status(404).json({ error: "job_not_found" });
     res.json(formatJob(rows[0]));
   } catch (err) {
-    res.status(500).json({ error: "internal_error", message: err.message });
+    console.error("[GET /jobs/:uuid]", err);
+    res.status(500).json({ error: "internal_error" });
   }
 });
 
@@ -79,7 +81,8 @@ router.get("/:uuid/results", async (req, res) => {
       })),
     });
   } catch (err) {
-    res.status(500).json({ error: "internal_error", message: err.message });
+    console.error("[GET /jobs/:uuid/results]", err);
+    res.status(500).json({ error: "internal_error" });
   }
 });
 
