@@ -4,9 +4,19 @@ import { requireAuth } from "../middleware/requireAuth.js";
 
 const router = Router();
 
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "admin";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "change-me";
-const SESSION_SECRET = process.env.SESSION_SECRET || "change-me-in-prod";
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
+  throw new Error(
+    "ADMIN_USERNAME and ADMIN_PASSWORD env vars must both be set",
+  );
+}
+const SESSION_SECRET = process.env.SESSION_SECRET;
+if (!SESSION_SECRET || SESSION_SECRET.length < 32) {
+  throw new Error(
+    "SESSION_SECRET env var must be set and at least 32 characters long",
+  );
+}
 const SESSION_DAYS = 30;
 const IS_PROD = process.env.NODE_ENV === "production";
 
