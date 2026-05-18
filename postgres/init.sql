@@ -44,12 +44,14 @@ CREATE TABLE IF NOT EXISTS verifications (
   raw_result   JSONB,
   duration_ms  INT,
   status       TEXT NOT NULL DEFAULT 'pending',
-  verified_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  verified_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  claimed_at   TIMESTAMPTZ
 );
 
-CREATE INDEX IF NOT EXISTS idx_verifications_bulk_job ON verifications(bulk_job_id);
-CREATE INDEX IF NOT EXISTS idx_verifications_status   ON verifications(status) WHERE status = 'pending';
-CREATE INDEX IF NOT EXISTS idx_verifications_email    ON verifications(email);
+CREATE INDEX IF NOT EXISTS idx_verifications_bulk_job   ON verifications(bulk_job_id);
+CREATE INDEX IF NOT EXISTS idx_verifications_status     ON verifications(status) WHERE status = 'pending';
+CREATE INDEX IF NOT EXISTS idx_verifications_email      ON verifications(email);
+CREATE INDEX IF NOT EXISTS idx_verifications_processing ON verifications(claimed_at) WHERE status = 'processing';
 
 CREATE TABLE IF NOT EXISTS ip_pool (
   id            SERIAL PRIMARY KEY,

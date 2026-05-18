@@ -7,6 +7,7 @@ import { ping, pool } from "./db/index.js";
 import { isMockMode } from "./services/reacher.js";
 import { startWorker, stopWorker } from "./services/bulkProcessor.js";
 import { startDailyResetCron } from "./cron/dailyReset.js";
+import { startStaleClaimCron } from "./cron/staleClaim.js";
 import { requireAuth } from "./middleware/requireAuth.js";
 
 import authRouter from "./api/auth.js";
@@ -47,6 +48,7 @@ let server;
 
   startWorker();
   startDailyResetCron();
+  startStaleClaimCron();
 
   server = app.listen(PORT, HOST, () => {
     console.log(`[startup] mailverify listening on http://${HOST}:${PORT}`);

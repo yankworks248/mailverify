@@ -17,7 +17,8 @@ async function claimBatch(limit) {
        FOR UPDATE SKIP LOCKED
      )
      UPDATE verifications v
-        SET status = 'processing'
+        SET status = 'processing',
+            claimed_at = NOW()
        FROM next
       WHERE v.id = next.id
      RETURNING v.id, v.email, v.bulk_job_id`,
