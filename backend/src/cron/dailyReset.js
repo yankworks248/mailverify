@@ -13,7 +13,7 @@ export function startDailyResetCron() {
     } catch (err) {
       console.error('[cron] daily reset failed:', err.message);
     }
-  }, { timezone: 'UTC' });
+  }, { timezone: 'Asia/Kolkata' });
 
-  console.log('[cron] daily reset scheduled at 00:00 UTC');
+  console.log('[cron] daily reset scheduled at 00:00 IST');
 }
