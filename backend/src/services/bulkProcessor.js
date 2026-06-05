@@ -87,35 +87,44 @@ async function processOne(row) {
   }
 }
 
-async function tick() {
-  const batch = await claimBatch(CONCURRENCY);
-  if (batch.length === 0) return 0;
-  await Promise.all(batch.map(processOne));
-  return batch.length;
+async function workerLoop(workerId) {
+  while (!stopRequested) {
+    let batch;
+    try {
+      batch = await claimBatch(1);
+    } catch (err) {
+      console.error(`[worker ${workerId}] claim error:`, err.message);
+      await sleep(POLL_MS);
+      continue;
+    }
+    if (batch.length === 0) {
+      await sleep(POLL_MS);
+      continue;
+    }
+    try {
+      await processOne(batch[0]);
+    } catch (err) {
+      console.error(`[worker ${workerId}] process error:`, err.message);
+    }
+  }
 }
-
 export function startWorker() {
   if (running) return;
   running = true;
   stopRequested = false;
   stoppedPromise = new Promise((resolve) => { stoppedResolver = resolve; });
-  console.log(`[worker] started — concurrency=${CONCURRENCY}, poll=${POLL_MS}ms`);
-
-  (async function loop() {
-    while (!stopRequested) {
-      try {
-        const n = await tick();
-        if (n === 0) await sleep(POLL_MS);
-      } catch (err) {
-        console.error('[worker] tick error:', err.message);
-        await sleep(POLL_MS);
-      }
-    }
+  console.log(`[worker] started — ${CONCURRENCY} persistent workers, poll=${POLL_MS}ms`);
+  const workers = [];
+  for (let i = 0; i < CONCURRENCY; i++) {
+    workers.push(workerLoop(i));
+  }
+  Promise.all(workers).then(() => {
     running = false;
     console.log('[worker] stopped');
     if (stoppedResolver) stoppedResolver();
-  })();
+  });
 }
+
 
 export function stopWorker() {
   stopRequested = true;

@@ -17,7 +17,7 @@ services:
       MOCK_REACHER: "false"
       REACHER_URL: "http://127.0.0.1:8080/v0/check_email"
       VERIFIER_FROM_EMAIL: "verifier@inboxaxis.net"
-      REACHER_TIMEOUT_MS: "30000"
+      REACHER_TIMEOUT_MS: "10000"
       WORKER_CONCURRENCY: "60"
       WORKER_POLL_MS: "2000"
       CORS_ORIGIN: "https://verify.inboxaxis.net"
