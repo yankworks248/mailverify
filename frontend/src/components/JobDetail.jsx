@@ -78,7 +78,7 @@ export default function JobDetail({ job, onBack, refreshTick }) {
               <a href={api.resultsCsvUrl(job.jobUuid)} download
                 className="px-3 py-1.5 rounded-lg bg-accent text-white text-[12px] font-medium
                            hover:bg-accent-hover transition-base">
-                Download CSV
+                Download All CSV
               </a>
             )}
           </div>
@@ -94,16 +94,20 @@ export default function JobDetail({ job, onBack, refreshTick }) {
           <div className="grid grid-cols-2 gap-2">
             <BreakdownRow color={VERDICT_DOTS.valid}   label="Valid"
               count={job.validCount}   total={job.processedCount} active={filter==='valid'}
-              onClick={() => setFilter(filter==='valid'?'all':'valid')} />
+              onClick={() => setFilter(filter==='valid'?'all':'valid')}
+              downloadUrl={isDone ? api.resultsCsvUrl(job.jobUuid, 'valid') : null} />
             <BreakdownRow color={VERDICT_DOTS.risky}   label="Risky"
               count={job.riskyCount}   total={job.processedCount} active={filter==='risky'}
-              onClick={() => setFilter(filter==='risky'?'all':'risky')} />
+              onClick={() => setFilter(filter==='risky'?'all':'risky')}
+              downloadUrl={isDone ? api.resultsCsvUrl(job.jobUuid, 'risky') : null} />
             <BreakdownRow color={VERDICT_DOTS.invalid} label="Invalid"
               count={job.invalidCount} total={job.processedCount} active={filter==='invalid'}
-              onClick={() => setFilter(filter==='invalid'?'all':'invalid')} />
+              onClick={() => setFilter(filter==='invalid'?'all':'invalid')}
+              downloadUrl={isDone ? api.resultsCsvUrl(job.jobUuid, 'invalid') : null} />
             <BreakdownRow color={VERDICT_DOTS.unknown} label="Unknown"
               count={job.unknownCount} total={job.processedCount} active={filter==='unknown'}
-              onClick={() => setFilter(filter==='unknown'?'all':'unknown')} />
+              onClick={() => setFilter(filter==='unknown'?'all':'unknown')}
+              downloadUrl={isDone ? api.resultsCsvUrl(job.jobUuid, 'unknown') : null} />
           </div>
         </div>
       </section>
@@ -186,20 +190,32 @@ export default function JobDetail({ job, onBack, refreshTick }) {
   );
 }
 
-function BreakdownRow({ color, label, count, total, active, onClick }) {
+function BreakdownRow({ color, label, count, total, active, onClick, downloadUrl }) {
   const pct = total > 0 ? (count / total) * 100 : 0;
   return (
-    <button type="button" onClick={onClick}
-      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border text-left transition-base
+    <div className={`flex items-center rounded-lg border transition-base
                   ${active ? 'border-zinc-300 bg-zinc-50' : 'border-zinc-200 bg-white hover:bg-zinc-50/50'}`}>
-      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: color }} />
-      <div className="flex-1 min-w-0">
-        <div className="text-[11px] text-zinc-500 uppercase tracking-wider">{label}</div>
-        <div className="text-[16px] font-semibold text-zinc-900 tabular-nums">
-          {count.toLocaleString()}
-          <span className="text-[11px] font-normal text-zinc-400 ml-1.5">{pct.toFixed(1)}%</span>
+      <button type="button" onClick={onClick}
+        className="flex items-center gap-3 px-3 py-2.5 text-left flex-1 min-w-0">
+        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: color }} />
+        <div className="flex-1 min-w-0">
+          <div className="text-[11px] text-zinc-500 uppercase tracking-wider">{label}</div>
+          <div className="text-[16px] font-semibold text-zinc-900 tabular-nums">
+            {count.toLocaleString()}
+            <span className="text-[11px] font-normal text-zinc-400 ml-1.5">{pct.toFixed(1)}%</span>
+          </div>
         </div>
-      </div>
-    </button>
+      </button>
+      {downloadUrl && count > 0 && (
+        <a href={downloadUrl} download title={`Download ${label} CSV`}
+          className="shrink-0 self-stretch flex items-center px-3 text-zinc-400
+                     hover:text-accent border-l border-zinc-100 transition-base">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round"
+              d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
+        </a>
+      )}
+    </div>
   );
 }

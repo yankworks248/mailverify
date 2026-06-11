@@ -71,7 +71,8 @@ export const api = {
       `/api/jobs/${uuid}/results?limit=${limit}&offset=${offset}`,
     );
   },
-  resultsCsvUrl(uuid) {
-    return `/api/jobs/${uuid}/results.csv`;
+  resultsCsvUrl(uuid, verdict) {
+    const base = `/api/jobs/${uuid}/results.csv`;
+    return verdict ? `${base}?verdict=${encodeURIComponent(verdict)}` : base;
   },
 };

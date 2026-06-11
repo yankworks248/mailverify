@@ -95,13 +95,25 @@ router.get("/:uuid/results.csv", async (req, res) => {
     if (jobRows.length === 0) return res.status(404).send("job_not_found");
 
     const job = jobRows[0];
+
+    const ALLOWED_VERDICTS = ["valid", "invalid", "risky", "unknown"];
+    const verdict = String(req.query.verdict || "").toLowerCase();
+    const filterByVerdict = ALLOWED_VERDICTS.includes(verdict);
+
+    const params = [job.id];
+    let whereClause = "WHERE bulk_job_id = $1";
+    if (filterByVerdict) {
+      params.push(verdict);
+      whereClause += " AND verdict = $2";
+    }
+
     const { rows } = await pool.query(
       `SELECT first_name, last_name, email, verdict, reason,
               host(ip_used)::text AS ip_used, duration_ms, verified_at
        FROM verifications
-       WHERE bulk_job_id = $1
+       ${whereClause}
        ORDER BY id`,
-      [job.id],
+      params,
     );
 
     const csv = stringify(rows, {
@@ -121,10 +133,12 @@ router.get("/:uuid/results.csv", async (req, res) => {
       .replace(/\.csv$/i, "")
       .replace(/[^A-Za-z0-9_.-]+/g, "_");
 
+    const suffix = filterByVerdict ? verdict : "verified";
+
     res.setHeader("Content-Type", "text/csv; charset=utf-8");
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="${safeName}_verified.csv"`,
+      `attachment; filename="${safeName}_${suffix}.csv"`,
     );
     res.send(csv);
   } catch (err) {
