@@ -2,6 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import { verifySingle } from '../services/verifier.js';
 import { peekCsv, extractRows } from '../services/csvParser.js';
+import { notifyWork } from '../services/bulkProcessor.js';
 import { pool } from '../db/index.js';
 
 const router = Router();
@@ -87,6 +88,7 @@ router.post('/bulk', upload.single('file'), async (req, res) => {
     );
 
     await client.query('COMMIT');
+    notifyWork(); // wake idle workers immediately for the new pending rows
     res.json({
       jobUuid: job.job_uuid,
       jobId: Number(job.id),
